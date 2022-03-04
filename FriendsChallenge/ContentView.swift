@@ -7,8 +7,32 @@
 
 import SwiftUI
 
+struct UsersView: View {
+    let users: [User]
+    
+    var body: some View {
+        List {
+            ForEach(users, id: \.self.id) { user in
+                HStack {
+                    VStack {
+                        Text(user.name)
+                            .font(.headline)
+                            .padding()
+                        Text("Friends Count: \(user.friends.count)")
+                            .font(.caption)
+                    }
+                    Text("\(user.age)")
+                        .font(.caption)
+                }
+                
+            }
+        }
+    }
+}
+
 struct ContentView: View {
     @State private var isLoading = true
+    @State var usersData: [User] = []
     
     var body: some View {
         ZStack {
@@ -16,8 +40,7 @@ struct ContentView: View {
                 ProgressView("Downloading...")
                    
             } else {
-                Text("Download complete")
-                    .padding()
+               UsersView(users: usersData)
             }
         }
         .task {
@@ -42,6 +65,7 @@ struct ContentView: View {
             
             let userData = try decoder.decode([User].self, from: data)
             print("USerData: \(userData)")
+            usersData = userData
         } catch {
             print("Error during the data download: \(error)")
         }
