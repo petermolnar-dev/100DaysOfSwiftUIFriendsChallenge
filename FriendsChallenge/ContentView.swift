@@ -8,23 +8,28 @@
 import SwiftUI
 
 struct UsersView: View {
-    let users: [User]
+    @ObservedObject var usersStore: UsersStore
     
     var body: some View {
         List {
-            ForEach(users, id: \.self.id) { user in
-                HStack {
-                    VStack {
+            ForEach(usersStore.users, id: \.self.id) { user in
+                VStack {
+                   
                         Text(user.name)
                             .font(.headline)
                             .padding()
+                 
+                    HStack {
                         Text("Friends Count: \(user.friends.count)")
                             .font(.caption)
+                        Text("Age: \(user.age)")
+                            .font(.caption)
                     }
-                    Text("\(user.age)")
-                        .font(.caption)
+                    
                 }
-                
+                .padding(.vertical)
+                .frame(maxWidth: .infinity)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
             }
         }
     }
@@ -32,52 +37,30 @@ struct UsersView: View {
 
 struct ContentView: View {
     @State private var isLoading = true
-    @State var usersData: [User] = []
+    @StateObject var usersStore = UsersStore()
     
     var body: some View {
         ZStack {
             if isLoading {
                 ProgressView("Downloading...")
-                   
+                
             } else {
-               UsersView(users: usersData)
+                UsersView(usersStore: usersStore)
             }
         }
         .task {
-            await loadData()
+            await usersStore.loadData()
+            self.isLoading = false
         }
+        
         
     }
     
-    func loadData() async {
-        guard let url = URL(string: "https://www.hackingwithswift.com/samples/friendface.json") else {
-            return
-        }
-        isLoading = true
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        
-        do {
-            let (data, _) = try await URLSession.shared.data(for: request)
-            
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            
-            let userData = try decoder.decode([User].self, from: data)
-            print("USerData: \(userData)")
-            usersData = userData
-        } catch {
-            print("Error during the data download: \(error)")
-        }
-        withAnimation {
-            isLoading = false
-        }
-        
-    }
+    
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ContentView()
+//    }
+//}
