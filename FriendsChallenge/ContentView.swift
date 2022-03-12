@@ -11,26 +11,37 @@ struct UsersView: View {
     @ObservedObject var usersStore: UsersStore
     
     var body: some View {
-        List {
-            ForEach(usersStore.users, id: \.self.id) { user in
-                VStack {
-                   
-                        Text(user.name)
-                            .font(.headline)
-                            .padding()
-                 
-                    HStack {
-                        Text("Friends Count: \(user.friends.count)")
-                            .font(.caption)
-                        Text("Age: \(user.age)")
-                            .font(.caption)
+        NavigationView {
+            Group {
+            List {
+                ForEach(usersStore.users, id: \.self.id) { user in
+                    NavigationLink {
+                        UserDetailedView(currentUser: user)
+                    } label: {
+                        VStack {
+                            
+                            Text(user.name)
+                                .font(.headline)
+                                .padding()
+                            
+                            HStack {
+                                Text("Friends Count: \(user.friends.count)")
+                                    .font(.caption)
+                                Text("Active: \( user.isActive ? "🟢" : "🔴")")
+                                    .font(.caption)
+                            }
+                            
+                        }
+                        .padding(.vertical)
+                        .frame(maxWidth: .infinity)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
                     
                 }
-                .padding(.vertical)
-                .frame(maxWidth: .infinity)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
             }
+            }
+            .navigationTitle("Friends")
+            .preferredColorScheme(.dark)
         }
     }
 }
