@@ -11,8 +11,22 @@ struct UserDetailedView: View {
     var currentUser: User
     
     var body: some View {
-        Text("Name: \(currentUser.name)")
+        HStack {
         
+        Text("Name: \(currentUser.name)")
+            .font(.headline)
+            .padding()
+        }
+        Text("Age: \(currentUser.age)")
+        Text("About: \(currentUser.about)")
+        Text("Registered: \(currentUser.registered.formatted())")
+        
+        List {
+            ForEach(currentUser.friends, id: \.self.id) { friend in
+                Text(friend.name)
+                    .font(.caption)
+            }
+        }
     }
 }
 
