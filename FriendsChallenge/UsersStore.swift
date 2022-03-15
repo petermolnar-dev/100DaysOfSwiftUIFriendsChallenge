@@ -15,6 +15,10 @@ class UsersStore: ObservableObject {
         guard let url = URL(string: "https://www.hackingwithswift.com/samples/friendface.json") else {
             return
         }
+        guard users.isEmpty else {
+            print("Cached users found. Won't download...")
+            return
+        }
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -27,6 +31,7 @@ class UsersStore: ObservableObject {
             
             let userData = try decoder.decode([User].self, from: data)
             DispatchQueue.main.async {
+                print("User data downloaded.")
                 self.users = userData
             }
         } catch {
